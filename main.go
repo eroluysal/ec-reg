@@ -2,9 +2,10 @@ package main
 
 import (
 	"flag"
-	"github.com/go-ini/ini"
 	"os"
 	"strconv"
+	
+	"github.com/go-ini/ini"
 )
 
 const (
