@@ -1,0 +1,9 @@
+# Directories
+/bin/
+/build/
+
+# Keeps
+!/bin/.keep
+
+# Files
+cfgb
