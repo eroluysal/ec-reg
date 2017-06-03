@@ -2,65 +2,102 @@ package main
 
 import (
 	"flag"
-	"os"
 	"strconv"
+	"os"
 
 	"github.com/go-ini/ini"
+	"github.com/fatih/structs"
 )
 
-const (
-	emptyConfigSection   = ""
-	defaultConfigSection = "*"
+type Config struct {
+	Root                   bool
+	Charset                string
+	EndOfLine              string
+	IndentSize             int
+	IndentStyle            string
+	InsertFinalNewLine     bool
+	TrimTrailingWhitespace bool
+}
 
-	rKey = "root"
-	cKey = "charset"
-	iKey = "indent_size"
-	eKey = "end_of_line"
-	sKey = "indent_style"
-	fKey = "insert_final_newline"
-	wKey = "trim_trailing_whitespace"
+const (
+	commonConfigSection  = "*"
+	defaultConfigSection = ""
 )
 
 var (
-	r = flag.Bool("r", true, "The root config value.")
-	c = flag.String("c", "UTF-8", "The charset config value.")
-	i = flag.Int("i", 4, "The indent-size config value.")
-	e = flag.String("e", "lf", "The end of line config value.")
-	s = flag.String("s", "space", "The indent_style config value.")
-	f = flag.Bool("t", true, "The `insert_final_newline` config value.")
-	w = flag.Bool("w", true, "The `trim_trailing_whitespace` config value")
+	r = flag.Bool("r", true, "special property that should be specified "+
+		"at the top of the file outside of any sections. Set to true "+
+		"to stop .editorconfig files search on current file.")
+
+	c = flag.String("c", "UTF-8", "set to latin1, utf-8, utf-8-bom, "+
+		"utf-16be or utf-16le to control the character set. Use of "+
+		"utf-8-bom is discouraged.")
+
+	i = flag.Int("i", 4, "a whole number defining the number of columns "+
+		"used for each indentation level and the width of soft tabs "+
+		"(when supported). When set to tab, the value of tab_width "+
+		"(if specified) will be used.")
+
+	e = flag.String("e", "lf", "set to lf, cr, or crlf to control how "+
+		"line breaks are represented.")
+
+	s = flag.String("s", "space", "set to tab or space to use hard tabs "+
+		"or soft tabs respectively.")
+
+	f = flag.Bool("f", true, "set to true to ensure file ends with a "+
+		"newline when saving and false to ensure it doesn't.")
+
+	t = flag.Bool("t", true, "set to true to remove any whitespace "+
+		"characters preceding newline characters and false to ensure "+
+		"it doesn't.")
 )
 
 func main() {
 	flag.Parse()
 
-	cfg := ini.Empty()
+	iniStub := ini.Empty()
 
-	defineRootConfiguration(cfg)
-
-	defineOtherConfigurations(cfg)
-
-	cfg.WriteTo(os.Stdout)
-}
-
-func defineRootConfiguration(cfg *ini.File) {
-	if *r == true {
-		cfg.Section(emptyConfigSection).NewKey(rKey, strconv.FormatBool(*r))
+	config := &Config{
+		Root:                   *r,
+		Charset:                *c,
+		EndOfLine:              *e,
+		IndentSize:             *i,
+		IndentStyle:            *s,
+		InsertFinalNewLine:     *f,
+		TrimTrailingWhitespace: *t,
 	}
-}
 
-func defineOtherConfigurations(cfg *ini.File) {
-	o := cfg.Section(defaultConfigSection)
+	cStruct := structs.New(config)
 
-	o.NewKey(cKey, *c)
+	keyMappings := map[string]interface{}{
+		"Root":                   "root",
+		"Charset":                "charset",
+		"EndOfLine":              "end_of_line",
+		"IndentSize":             "indent_size",
+		"IndentStyle":            "indent_style",
+		"InsertFinalNewLine":     "insert_final_newline",
+		"TrimTrailingWhitespace": "trim_trailing_whitespace",
+	}
 
-	o.NewKey(iKey, strconv.Itoa(*i))
+	if config.Root != false {
+		iniStub.Section(defaultConfigSection).NewKey("root",
+			strconv.FormatBool(*r))
+	}
 
-	o.NewKey(eKey, *e)
+	dStub := iniStub.Section(commonConfigSection)
 
-	o.NewKey(sKey, *s)
+	for key, value := range keyMappings {
+		v := cStruct.Field(key).Value()
 
-	o.NewKey(fKey, strconv.FormatBool(*f))
+		switch v.(type) {
+		case bool:
+			dStub.NewKey(value.(string), strconv.FormatBool(v.(bool)))
+		case int:
+			dStub.NewKey(value.(string), strconv.Itoa(v.(int)))
+		default:
+			dStub.NewKey(value.(string), v.(string))
+		}
+	}
 
-	o.NewKey(wKey, strconv.FormatBool(*w))
+	iniStub.WriteTo(os.Stdout)
 }
