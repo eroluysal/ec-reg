@@ -25,31 +25,32 @@ const (
 )
 
 var (
-	r = flag.Bool("r", true, "special property that should be specified "+
-		"at the top of the file outside of any sections. Set to true "+
-		"to stop .editorconfig files search on current file.")
+	r = flag.Bool("r", true, "`root:` special property that should be " +
+		"specified at the top of the file outside of any sections. " +
+		"Set to true to stop .editorconfig files search on current file.")
 
-	c = flag.String("c", "UTF-8", "set to latin1, utf-8, utf-8-bom, "+
-		"utf-16be or utf-16le to control the character set. Use of "+
-		"utf-8-bom is discouraged.")
+	c = flag.String("c", "UTF-8", "`charset:` set to latin1, utf-8, " +
+		"utf-8-bom, utf-16be or utf-16le to control the character set. " +
+		"Use of utf-8-bom is discouraged.")
 
-	i = flag.Int("i", 4, "a whole number defining the number of columns "+
-		"used for each indentation level and the width of soft tabs "+
-		"(when supported). When set to tab, the value of tab_width "+
-		"(if specified) will be used.")
+	i = flag.Int("i", 4, "`indent_size:` a whole number defining the " +
+		"number of columns used for each indentation level and the " +
+		"width of soft tabs (when supported). When set to tab, the " +
+		"value of tab_width (if specified) will be used.")
 
-	e = flag.String("e", "lf", "set to lf, cr, or crlf to control how "+
-		"line breaks are represented.")
+	e = flag.String("e", "lf", "`end_of_line:` set to lf, cr, or crlf to " +
+		"control how line breaks are represented.")
 
-	s = flag.String("s", "space", "set to tab or space to use hard tabs "+
-		"or soft tabs respectively.")
+	s = flag.String("s", "space", "`indent_style:` set to tab or space to " +
+		"use hard tabs or soft tabs respectively.")
 
-	f = flag.Bool("f", true, "set to true to ensure file ends with a "+
-		"newline when saving and false to ensure it doesn't.")
+	f = flag.Bool("f", true, "`insert_final_newline:` set to true to " +
+		"ensure file ends with a newline when saving and false to " +
+		"ensure it doesn't.")
 
-	t = flag.Bool("t", true, "set to true to remove any whitespace "+
-		"characters preceding newline characters and false to ensure "+
-		"it doesn't.")
+	t = flag.Bool("t", true, "`trim_trailing_whitespace:` set to true to " +
+		"remove any whitespace characters preceding newline " +
+		"characters and false to ensure it doesn't.")
 )
 
 func main() {
