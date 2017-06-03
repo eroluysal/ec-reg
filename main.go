@@ -53,6 +53,18 @@ var (
 		"characters and false to ensure it doesn't.")
 )
 
+var (
+	keysMapping = map[string]string{
+		"Root":                   "root",
+		"Charset":                "charset",
+		"EndOfLine":              "end_of_line",
+		"IndentSize":             "indent_size",
+		"IndentStyle":            "indent_style",
+		"InsertFinalNewLine":     "insert_final_newline",
+		"TrimTrailingWhitespace": "trim_trailing_whitespace",
+	}
+)
+
 func main() {
 	flag.Parse()
 
@@ -70,27 +82,17 @@ func main() {
 
 	cStruct := structs.New(config)
 
-	keyMappings := map[string]string{
-		"Root":                   "root",
-		"Charset":                "charset",
-		"EndOfLine":              "end_of_line",
-		"IndentSize":             "indent_size",
-		"IndentStyle":            "indent_style",
-		"InsertFinalNewLine":     "insert_final_newline",
-		"TrimTrailingWhitespace": "trim_trailing_whitespace",
-	}
-
 	if config.Root != false {
-		iniStub.Section(defaultConfigSection).
-			NewKey(keyMappings["Root"], strconv.FormatBool(*r))
+		iniStub.Section(defaultConfigSection).NewKey(
+			keysMapping["Root"], strconv.FormatBool(*r))
 	}
 
 	dStub := iniStub.Section(commonConfigSection)
 
-	for key, value := range keyMappings {
+	for key, value := range keysMapping {
 		v := cStruct.Field(key).Value()
 
-		if value == keyMappings["Root"] {
+		if value == keysMapping["Root"] {
 			continue
 		}
 
