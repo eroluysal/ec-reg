@@ -69,7 +69,7 @@ func main() {
 
 	cStruct := structs.New(config)
 
-	keyMappings := map[string]interface{}{
+	keyMappings := map[string]string{
 		"Root":                   "root",
 		"Charset":                "charset",
 		"EndOfLine":              "end_of_line",
@@ -80,8 +80,10 @@ func main() {
 	}
 
 	if config.Root != false {
-		iniStub.Section(defaultConfigSection).NewKey("root",
-			strconv.FormatBool(*r))
+		iniStub.Section(defaultConfigSection).
+			NewKey(keyMappings["Root"], strconv.FormatBool(*r))
+
+		delete(keyMappings, "Root")
 	}
 
 	dStub := iniStub.Section(commonConfigSection)
@@ -91,11 +93,11 @@ func main() {
 
 		switch v.(type) {
 		case bool:
-			dStub.NewKey(value.(string), strconv.FormatBool(v.(bool)))
+			dStub.NewKey(value, strconv.FormatBool(v.(bool)))
 		case int:
-			dStub.NewKey(value.(string), strconv.Itoa(v.(int)))
+			dStub.NewKey(value, strconv.Itoa(v.(int)))
 		default:
-			dStub.NewKey(value.(string), v.(string))
+			dStub.NewKey(value, v.(string))
 		}
 	}
 
