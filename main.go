@@ -82,14 +82,16 @@ func main() {
 	if config.Root != false {
 		iniStub.Section(defaultConfigSection).
 			NewKey(keyMappings["Root"], strconv.FormatBool(*r))
-
-		delete(keyMappings, "Root")
 	}
 
 	dStub := iniStub.Section(commonConfigSection)
 
 	for key, value := range keyMappings {
 		v := cStruct.Field(key).Value()
+
+		if value == keyMappings["Root"] {
+			continue
+		}
 
 		switch v.(type) {
 		case bool:
